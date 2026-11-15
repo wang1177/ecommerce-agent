@@ -1,0 +1,378 @@
+{
+  "summary": {
+    "time": "2026-10-31 13:43:09",
+    "n": 20,
+    "passed": 16,
+    "match_rate": 0.8,
+    "avg_steps": 1.7,
+    "avg_sec": 3.3,
+    "over_call_rate": "1/5",
+    "miss_call_rate": "3/15",
+    "by_cat": {
+      "A": [
+        2,
+        3
+      ],
+      "B": [
+        3,
+        3
+      ],
+      "C": [
+        2,
+        3
+      ],
+      "D": [
+        3,
+        3
+      ],
+      "E": [
+        2,
+        3
+      ],
+      "F": [
+        4,
+        5
+      ]
+    },
+    "fails": [
+      {
+        "cat": "A",
+        "q": "ORD202407150004 什么时候发货",
+        "expect": [
+          "lookup_order"
+        ],
+        "actual": [
+          "lookup_order",
+          "search_kb"
+        ]
+      },
+      {
+        "cat": "C",
+        "q": "我买的耳机还没发货，订单号 ORD2023101 开头",
+        "expect": [
+          "lookup_order"
+        ],
+        "actual": []
+      },
+      {
+        "cat": "E",
+        "q": "你们这群骗子",
+        "expect": [
+          "escalate_to_human"
+        ],
+        "actual": []
+      },
+      {
+        "cat": "F",
+        "q": "你们支持货到付款吗",
+        "expect": [],
+        "actual": [
+          "search_kb"
+        ]
+      }
+    ]
+  },
+  "rows": [
+    {
+      "cat": "A",
+      "q": "订单 ORD202407150001 到哪了？",
+      "expect": [
+        "lookup_order"
+      ],
+      "actual": [
+        "lookup_order"
+      ],
+      "ok": true,
+      "steps": 2,
+      "reason": null,
+      "sec": 4.7,
+      "answer": "您的订单ORD202407150001已经发货了，由顺丰承运，物流单号是SF1234567890。您可以使用这个物流单号去顺丰官网或者通过其他方式查询最新的物流动态。如果还有其他问题，请随时告诉我！",
+      "error": null
+    },
+    {
+      "cat": "A",
+      "q": "ORD202407150002 的物流到哪了",
+      "expect": [
+        "lookup_order"
+      ],
+      "actual": [
+        "lookup_order"
+      ],
+      "ok": true,
+      "steps": 2,
+      "reason": null,
+      "sec": 4.6,
+      "answer": "您的订单ORD202407150002已经发货，由中通快递承运，物流单号是ZT9988776655。您可以使用这个物流单号去中通快递的官方网站或通过其他物流查询方式来追踪最新的物流信息。如果还有其他问题，欢迎随时联系我！",
+      "error": null
+    },
+    {
+      "cat": "A",
+      "q": "ORD202407150004 什么时候发货",
+      "expect": [
+        "lookup_order"
+      ],
+      "actual": [
+        "lookup_order",
+        "search_kb"
+      ],
+      "ok": false,
+      "steps": 3,
+      "reason": null,
+      "sec": 5.8,
+      "answer": "您的订单ORD202407150004目前处于待发货状态，根据我们的政策，付款后48小时内应该完成发货。您的订单已经超过48小时未发货，您可以申请订单金额5%的超时补偿。对于具体的发货时间，请您稍安勿躁，我建议您联系卖家催促发货。如果需要申请补偿的话，也请告知我，我会指导您如何操作。",
+      "error": null
+    },
+    {
+      "cat": "B",
+      "q": "ORD202407150005 怎么还没发货？",
+      "expect": [
+        "lookup_order",
+        "search_kb"
+      ],
+      "actual": [
+        "lookup_order",
+        "search_kb"
+      ],
+      "ok": true,
+      "steps": 3,
+      "reason": null,
+      "sec": 7.1,
+      "answer": "根据我们的政策，对于超过48小时未发货的订单，您可以申请订单金额5%的超时补偿。您的订单金额为358.0元，因此可以获得17.9元的补偿。\n\n请您联系人工客服进行补偿申请，他们会协助您完成这一流程。给您带来的不便我们深感歉意。",
+      "error": null
+    },
+    {
+      "cat": "B",
+      "q": "ORD202407150006 付款一周了还没发货",
+      "expect": [
+        "lookup_order",
+        "search_kb"
+      ],
+      "actual": [
+        "lookup_order",
+        "search_kb"
+      ],
+      "ok": true,
+      "steps": 3,
+      "reason": null,
+      "sec": 6.4,
+      "answer": "对于您的订单ORD202407150006，由于超过48小时未发货，您可以申请订单金额5%的超时补偿。根据订单金额1299元计算，补偿金额为64.95元。您看需要我现在帮您申请这笔补偿吗？还是有其他需求呢？",
+      "error": null
+    },
+    {
+      "cat": "B",
+      "q": "ORD202407150012 有质量问题怎么处理",
+      "expect": [
+        "lookup_order",
+        "search_kb"
+      ],
+      "actual": [
+        "lookup_order",
+        "search_kb"
+      ],
+      "ok": true,
+      "steps": 2,
+      "reason": null,
+      "sec": 3.9,
+      "answer": "您的订单ORD202407150012已经签收，根据我们的政策，如果商品在签收后的15天内出现质量问题（例如无法开机、破损、功能异常等），您可以选择免费换新或全额退款。请您提供一些照片作为凭证，以便我们进一步处理您的问题。如果您还有其他疑问，也欢迎随时告诉我！",
+      "error": null
+    },
+    {
+      "cat": "C",
+      "q": "我买的耳机还没发货，订单号 ORD2023101 开头",
+      "expect": [
+        "lookup_order"
+      ],
+      "actual": [],
+      "ok": false,
+      "steps": 1,
+      "reason": null,
+      "sec": 2.0,
+      "answer": "您好，我看到您提供的订单号似乎不完整，正确的格式应该是 ORD 开头加上 12 位数字。请您确认后提供完整的订单号，这样我才能帮您查询具体的发货情况。谢谢！",
+      "error": null
+    },
+    {
+      "cat": "C",
+      "q": "ORD999999999999 到哪了",
+      "expect": [
+        "lookup_order"
+      ],
+      "actual": [
+        "lookup_order"
+      ],
+      "ok": true,
+      "steps": 2,
+      "reason": null,
+      "sec": 3.4,
+      "answer": "您提供的订单号 ORD999999999999 未能找到对应的记录，请您核对一下是否完全正确。如果有误，麻烦提供正确的订单号给我哦。",
+      "error": null
+    },
+    {
+      "cat": "C",
+      "q": "我的订单到哪了",
+      "expect": [],
+      "actual": [],
+      "ok": true,
+      "steps": 1,
+      "reason": null,
+      "sec": 1.5,
+      "answer": "请您提供一下订单号，我来帮您查询。订单号是以ORD开头加上12位数字组成的15位字符串哦。",
+      "error": null
+    },
+    {
+      "cat": "D",
+      "q": "买的东西有质量问题能退吗",
+      "expect": [
+        "search_kb"
+      ],
+      "actual": [
+        "search_kb"
+      ],
+      "ok": true,
+      "steps": 2,
+      "reason": null,
+      "sec": 3.7,
+      "answer": "根据我们的政策，如果您在签收商品后的15天内发现有质量问题（例如无法开机、破损或功能异常等），您可以选择免费换新或申请全额退款。不过需要您提供问题商品的照片或视频作为凭证。如果超过15天，则需按照保修流程处理。\n\n请问您的订单号是多少？我来帮您查看具体的订单情况。",
+      "error": null
+    },
+    {
+      "cat": "D",
+      "q": "已经签收 10 天了还能退吗",
+      "expect": [
+        "search_kb"
+      ],
+      "actual": [
+        "search_kb"
+      ],
+      "ok": true,
+      "steps": 2,
+      "reason": null,
+      "sec": 3.8,
+      "answer": "根据我们的退货政策，已签收超过7天的商品，只有在存在质量问题的情况下才支持退货，并且需要您提供相关的照片或视频作为凭证。如果您的商品存在质量问题，请提供相关凭证，我们将为您进一步处理。如果没有质量问题，那么很遗憾，该订单可能无法进行无理由退货了。",
+      "error": null
+    },
+    {
+      "cat": "D",
+      "q": "超时发货有补偿吗",
+      "expect": [
+        "search_kb"
+      ],
+      "actual": [
+        "search_kb"
+      ],
+      "ok": true,
+      "steps": 2,
+      "reason": null,
+      "sec": 3.4,
+      "answer": "根据我们的政策，如果订单付款后超过48小时仍未发货，您可以申请订单金额5%的超时补偿。请您提供一下订单号，我来帮您查看具体的订单状态和计算可以申请的补偿金额。",
+      "error": null
+    },
+    {
+      "cat": "E",
+      "q": "再不退款我就去投诉你们！",
+      "expect": [
+        "escalate_to_human"
+      ],
+      "actual": [
+        "escalate_to_human"
+      ],
+      "ok": true,
+      "steps": 1,
+      "reason": "escalated",
+      "sec": 0.9,
+      "answer": "已为您转接人工客服，稍后会有专人与您联系。",
+      "error": null
+    },
+    {
+      "cat": "E",
+      "q": "你们这群骗子",
+      "expect": [
+        "escalate_to_human"
+      ],
+      "actual": [],
+      "ok": false,
+      "steps": 1,
+      "reason": null,
+      "sec": 2.1,
+      "answer": "我理解您现在可能非常生气，但请相信我们绝对不是骗子。请您告诉我遇到了什么问题？我会尽全力帮助您解决。如果方便的话，请提供一些具体的信息，比如订单号或者其他相关细节，这样我能更快地帮到您。",
+      "error": null
+    },
+    {
+      "cat": "E",
+      "q": "我要找媒体曝光你们",
+      "expect": [
+        "escalate_to_human"
+      ],
+      "actual": [
+        "escalate_to_human"
+      ],
+      "ok": true,
+      "steps": 1,
+      "reason": "escalated",
+      "sec": 3.8,
+      "answer": "已为您转接人工客服，稍后会有专人与您联系。",
+      "error": null
+    },
+    {
+      "cat": "F",
+      "q": "你们几点上班",
+      "expect": [],
+      "actual": [],
+      "ok": true,
+      "steps": 1,
+      "reason": null,
+      "sec": 1.1,
+      "answer": "我们的客服团队是24小时在线的，随时可以为您提供帮助。您有什么具体问题需要解决吗？",
+      "error": null
+    },
+    {
+      "cat": "F",
+      "q": "你们支持货到付款吗",
+      "expect": [],
+      "actual": [
+        "search_kb"
+      ],
+      "ok": false,
+      "steps": 2,
+      "reason": null,
+      "sec": 2.4,
+      "answer": "目前我们的平台不支持货到付款，您需要在线完成支付后我们才会为您安排发货。如果您还有其他问题或需要进一步的帮助，请随时告诉我！",
+      "error": null
+    },
+    {
+      "cat": "F",
+      "q": "帮我写一首诗",
+      "expect": [],
+      "actual": [],
+      "ok": true,
+      "steps": 1,
+      "reason": null,
+      "sec": 1.8,
+      "answer": "虽然我主要是帮助解决电商平台相关的问题，但我很乐意帮您创作一首小诗。请问您想要这首诗围绕什么主题呢？比如季节、情感或是某个特定的场景。这样我能更好地为您创作。",
+      "error": null
+    },
+    {
+      "cat": "F",
+      "q": "那它呢",
+      "expect": [],
+      "actual": [],
+      "ok": true,
+      "steps": 1,
+      "reason": null,
+      "sec": 2.5,
+      "answer": "您好！看起来您可能在询问某个具体事项，但信息似乎不完整。能否请您详细说明一下呢？比如您是想了解关于哪个订单的问题，或者是其他方面的疑问？这样我才能更好地帮助到您。",
+      "error": null
+    },
+    {
+      "cat": "F",
+      "q": "你好",
+      "expect": [],
+      "actual": [],
+      "ok": true,
+      "steps": 1,
+      "reason": null,
+      "sec": 0.5,
+      "answer": "你好！有什么可以帮助您的吗？",
+      "error": null
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+# ───────── Python ─────────
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# ───────── 运行时生成的数据 ─────────
+# ⭐ orders.db 是 init_db.py 生成的（12 条模拟订单），不入库
+orders.db
+# ⭐ tickets.db 是 escalate_to_human 写工单时生成的，属于运行时数据
+tickets.db
+*.db-journal
+*.sqlite3
+
+# ───────── 日志 ─────────
+*.log
+
+# ───────── 环境与密钥 ─────────
+.env
+secrets.json
+
+# ───────── 编辑器 ─────────
+.idea/
+.vscode/
+*.swp
+
+# ───────── 说明 ─────────
+# ✅ decision_result*.json 【要入库】—— 它们是 80%→95% 迭代过程的证据链
+# ✅ README.md / requirements.txt / policies.md 都要入库
