@@ -42,6 +42,12 @@ class ChatResponse(BaseModel):
     trace: list              #必填，每步工具调用记录
     steps: int               #必填，模型的轮数
     reason: str | None = None  #可选，模型的拒绝理由
+    # ⭐ 2026-11-15 新增：是否需要人工跟进
+    #    agent.py 的 finish() 已经返回这个字段，但【必须在这里声明】
+    #    否则 FastAPI 按 response_model 序列化时会【静默丢弃】
+    needs_human: bool = False
+    # ⭐ 2026-11-15 新增：请求 ID（一次请求的所有日志用它串起来）
+    request_id: str | None = None
     history_turns_used: int | None = None  #可选，历史对话轮数
     # ⭐ 估算 token（len//2，已知低估 3.5~4.5 倍）
     est_tokens: int | None = None
