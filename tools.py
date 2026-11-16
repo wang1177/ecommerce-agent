@@ -33,6 +33,26 @@ TICKETS_DB_PATH = os.path.join(BASE_DIR, "tickets.db")
 #    用正则校验而不是 len()，因为 len 只能挡"太短"，挡不住"格式不对"。
 ORDER_ID_RE = re.compile(r"^ORD\d{12}$", re.IGNORECASE)  #re.IGNORECASE忽略大小写
 
+# ⭐ 物流轨迹：直接写 dict，不建 SQLite 表。
+#    因为这是"演示用轨迹"，没有增量写入需求 —— 只有转人工要往库里写。
+#    key = 订单号，value = 该订单的物流状态。
+_LOGISTICS = {
+    "ORD202407150001": {"status": "运输中",
+                        "latest": "快件已到达 杭州分拨中心",
+                        "updated_at": "2026-11-15 21:40"},
+    "ORD202407150002": {"status": "运输中",
+                        "latest": "快件已到达 宁波分拨中心，正在发往网点",
+                        "updated_at": "2026-11-16 07:15"},
+    "ORD202407150010": {"status": "派送中",
+                        "latest": "宁波鄞州网点快递员派送中，电话 138****6621",
+                        "updated_at": "2026-11-16 08:52"},
+    "ORD202407150007": {"status": "已签收",
+                        "latest": "快件已签收，签收人：本人",
+                        "updated_at": "2026-11-13 15:08"},
+    "ORD202407150012": {"status": "已签收",
+                        "latest": "快件已签收，签收人：门卫代收",
+                        "updated_at": "2026-11-14 11:31"},
+}
 
 @tool
 def lookup_order(order_id: str) -> str:
@@ -134,6 +154,30 @@ def search_kb(query: str) -> str:
 
 
 @tool
+def query_logistics(order_id:str)->str:
+    """
+    这个工具用于查询物流轨迹，输入订单号，返回物流状态。
+    适用场景：当用户问 快递到哪/发货了没/物流信息时调用
+    你需要先调用lookup_order确认订单状态，别自己编正在派送等错误信息，一切消息都要通过订单号查出来
+    """
+    oid=(order_id or "").strip().upper()  #.strip()：去掉首尾空格；.upper():转大写
+    #格式不对
+    if not ORDER_ID_RE.match(oid):
+        return json.dumps({"error":f"订单格式不正确，应为 ORD + 12 位数字，例如 ORD202407150001"},ensure_ascii=False)
+    #格式对，但是没有物流记录
+    row=_LOGISTICS.get(oid)
+    if not row:
+        return json.dumps({"error":f"订单 {oid} 不存在，请先用lookup_order确认订单状态"},ensure_ascii=False)
+    #查到订单
+    return json.dumps({
+        "order_id": oid,
+        "status": row["status"],
+        "latest": row["latest"],
+        "updated_at": row["updated_at"]
+    },ensure_ascii=False)
+
+
+@tool
 def escalate_to_human(reason: str) -> str:
     """转人工客服。调用后本次对话立即结束并交给人工处理。
 
@@ -171,7 +215,7 @@ def escalate_to_human(reason: str) -> str:
 
 
 # 供 agent / main 使用
-TOOLS = [lookup_order, search_kb, escalate_to_human]  #把三个工具都放到列表里面
+TOOLS = [lookup_order, search_kb, query_logistics, escalate_to_human]  #把三个工具都放到列表里面
 TOOL_MAP = {t.name: t for t in TOOLS}
 #用字典推导式将列表转成字典t.name：键=名字， t for t in TOOLS遍历TOOLS值=对象
 
@@ -191,3 +235,9 @@ if __name__ == "__main__":
     print("  ", search_kb.invoke({"query": "发货时效"})[:120].replace("\n", " "))
     print("\n⑥ 转人工:")
     print("  ", escalate_to_human.invoke({"reason": "用户要求投诉"}))
+    print("\n⑦ 查物流（运输中）:")
+    print("  ", query_logistics.invoke({"order_id": "ORD202407150001"}))
+    print("\n⑧ 查物流（已签收）:")
+    print("  ", query_logistics.invoke({"order_id": "ORD202407150007"}))
+    print("\n⑨ 查物流（待发货，故意没轨迹）:")
+    print("  ", query_logistics.invoke({"order_id": "ORD202407150003"}))

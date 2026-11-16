@@ -158,7 +158,7 @@ def build_ui(agent_llm, max_turns: int = 3):
                    theme=gr.themes.Soft()) as demo:
         gr.Markdown(
             "## 电商客服 Agent\n"
-            "ReAct 循环 · 3 个工具（查订单 / 查政策 / 转人工） · 四道防护 · "
+            "ReAct 循环 · 4 个工具（查订单 / 查政策 / 查物流 / 转人工） · 四道防护 · "
             "**左侧对话，右侧执行轨迹**")
 
         with gr.Row():
