@@ -24,34 +24,34 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, "orders.db")
 POLICY_PATH = os.path.join(BASE_DIR, "policies.md")
 
-# ⭐ 工单数据单独一个库。为什么不放 orders.db：
-#    orders.db 是 init_db.py 生成的【可重建】初始数据，
-#    而工单是【运行时累积】的。放一起的话，重跑 init_db.py 会把工单一起清掉。
+# 工单数据单独一个库。为什么不放 orders.db：
+#  orders.db 是 init_db.py 生成的【可重建】初始数据，
+#  而工单是【运行时累积】的。放一起的话，重跑 init_db.py 会把工单一起清掉。
 TICKETS_DB_PATH = os.path.join(BASE_DIR, "tickets.db")
 
-# ⭐ 订单号格式：ORD + 12 位数字 = 15 个字符，例如 ORD202407150001。
-#    用正则校验而不是 len()，因为 len 只能挡"太短"，挡不住"格式不对"。
+# 订单号格式：ORD + 12 位数字 = 15 个字符，例如 ORD202407150001。
+#  用正则校验而不是 len()，因为 len 只能挡"太短"，挡不住"格式不对"。
 ORDER_ID_RE = re.compile(r"^ORD\d{12}$", re.IGNORECASE)  #re.IGNORECASE忽略大小写
 
-# ⭐ 物流轨迹：直接写 dict，不建 SQLite 表。
-#    因为这是"演示用轨迹"，没有增量写入需求 —— 只有转人工要往库里写。
-#    key = 订单号，value = 该订单的物流状态。
+# 物流轨迹：直接写 dict，不建 SQLite 表。
+#  因为这是"演示用轨迹"，没有增量写入需求 —— 只有转人工要往库里写。
+#  key = 订单号，value = 该订单的物流状态。
 _LOGISTICS = {
     "ORD202407150001": {"status": "运输中",
                         "latest": "快件已到达 杭州分拨中心",
-                        "updated_at": "2026-11-15 21:40"},
+                        "updated_at": "21:40"},
     "ORD202407150002": {"status": "运输中",
                         "latest": "快件已到达 宁波分拨中心，正在发往网点",
-                        "updated_at": "2026-11-16 07:15"},
+                        "updated_at": "07:15"},
     "ORD202407150010": {"status": "派送中",
                         "latest": "宁波鄞州网点快递员派送中，电话 138****6621",
-                        "updated_at": "2026-11-16 08:52"},
+                        "updated_at": "08:52"},
     "ORD202407150007": {"status": "已签收",
                         "latest": "快件已签收，签收人：本人",
-                        "updated_at": "2026-11-13 15:08"},
+                        "updated_at": "15:08"},
     "ORD202407150012": {"status": "已签收",
                         "latest": "快件已签收，签收人：门卫代收",
-                        "updated_at": "2026-11-14 11:31"},
+                        "updated_at": "11:31"},
 }
 
 @tool
@@ -65,11 +65,11 @@ def lookup_order(order_id: str) -> str:
     返回字段含义：status 订单状态；hours_since_pay 付款至今多少小时；
     overdue 是否属于"未发货且已超过 48 小时"（补偿判定的依据）；
     carrier/tracking 承运商与物流单号；amount 订单金额；
-    ⭐ compensation_5pct 订单金额 5% 的超时补偿金额（已算好）；
-    ⭐ compensation_cap 单笔累计补偿上限 = 订单金额 10%（已算好）。
+    compensation_5pct 订单金额 5% 的超时补偿金额（已算好）；
+    compensation_cap 单笔累计补偿上限 = 订单金额 10%（已算好）。
     涉及金额时只能引用 compensation_* 字段，不要自己做乘法。
     """
-    oid = (order_id or "").strip().upper()      # ⭐ .strip()：去掉首尾空格；统一大写，兼容用户输入小写
+    oid = (order_id or "").strip().upper()      # .strip()：去掉首尾空格；统一大写，兼容用户输入小写
     if not ORDER_ID_RE.match(oid):
         return json.dumps(                            #校验格式
             {"error": f"订单号 '{oid}' 格式不正确，应为 ORD + 12 位数字"
@@ -91,9 +91,9 @@ def lookup_order(order_id: str) -> str:
 
     status, pay_time, carrier, tracking, amount, category = row
 
-    # ⭐ 以「小时」为单位判定超时，而不是「天」：
-    #    政策是"付款后 48 小时内发货"，用整数天数会把边界订单判错
-    #    （付款 2 天整 = 48 小时，可能刚好卡在线上）。
+    # 以「小时」为单位判定超时，而不是「天」：
+    #  政策是"付款后 48 小时内发货"，用整数天数会把边界订单判错
+    #  （付款 2 天整 = 48 小时，可能刚好卡在线上）。
     try:
         paid_at = datetime.strptime(pay_time, "%Y-%m-%d %H:%M")  #把pay_time字符串转成时间
     except ValueError:
@@ -111,10 +111,10 @@ def lookup_order(order_id: str) -> str:
 
     overdue = (status == "待发货") and hours > 48
 
-    # ⭐ 金额一律由代码算，模型只引用 —— 不把乘法留给模型。
-    #    实测模型会"四舍五入凭感觉"（1299×5% 报"约 65 元"，实为 64.95），
-    #    而补偿金额是承诺给用户的数字，必须精确。
-    #    这两个字段永远返回（不管有没有超时），由模型按政策决定是否引用。
+    # 金额一律由代码算，模型只引用 —— 不把乘法留给模型。
+    #  实测模型会"四舍五入凭感觉"（1299×5% 报"约 65 元"，实为 64.95），
+    #  而补偿金额是承诺给用户的数字，必须精确。
+    #  这两个字段永远返回（不管有没有超时），由模型按政策决定是否引用。
     compensation_5pct = round(amount * 0.05, 2) if amount else None
     compensation_cap = round(amount * 0.10, 2) if amount else None
 
@@ -129,7 +129,7 @@ def lookup_order(order_id: str) -> str:
         "carrier": carrier,
         "tracking": tracking,
         "amount": amount,
-        # ⭐ 预计算好的补偿金额（模型只能引用，不许自己乘）
+        # 预计算好的补偿金额（模型只能引用，不许自己乘）
         "compensation_5pct": compensation_5pct,
         "compensation_cap": compensation_cap,
         "category": category,
@@ -184,11 +184,11 @@ def escalate_to_human(reason: str) -> str:
     适用场景：用户情绪激烈（提到投诉、曝光、律师、报警）、涉及金额纠纷、
     需要超出政策额度审批、或你已连续两次查不到所需信息。调用时请填写具体原因。
     """
-    # ⭐ 2026-11-15 改：原来只返回 {"escalated": True}，没有任何记录 ——
-    #    "假转人工"（用户以为有人接手，其实什么都没有）。
-    #    现在真的写一条工单记录到 handoffs 表，人工可以直接查。
-    #    ⚠️ 工单写【tickets.db】而不是 orders.db —— 前者是运行时累积数据，
-    #       后者是 init_db.py 可重建的初始数据，混在一起会被一起清掉。
+    # 原来只返回 {"escalated": True}，没有任何记录 ——
+    #  "假转人工"（用户以为有人接手，其实什么都没有）。
+    #  现在真的写一条工单记录到 handoffs 表，人工可以直接查。
+    #  工单写【tickets.db】而不是 orders.db —— 前者是运行时累积数据，
+    #     后者是 init_db.py 可重建的初始数据，混在一起会被一起清掉。
     ticket_id = None
     try:
         conn = sqlite3.connect(TICKETS_DB_PATH, timeout=3)
@@ -205,7 +205,7 @@ def escalate_to_human(reason: str) -> str:
         conn.commit()
         conn.close()
     except Exception as e:
-        # ⚠️ 写库失败不能让转人工本身失败 —— 至少要把 reason 返回给模型
+        # 写库失败不能让转人工本身失败 —— 至少要把 reason 返回给模型
         return json.dumps({"escalated": True, "reason": reason,
                            "warning": f"工单落库失败：{type(e).__name__}"},
                           ensure_ascii=False)

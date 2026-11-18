@@ -1,6 +1,6 @@
 """冒烟检查（smoke test）· 改完代码后右键跑一次，30 秒知道有没有坏。
 
-用法：PyCharm 里右键 → Run 'check_agent'
+用法：PyCharm 里右键 → Run 'test_agent_e2e'
       （或 Shift+F10）
 
 它会检查 6 件事：
@@ -11,7 +11,7 @@
   ⑤ 真实跑一次，看工具序列和回答
   ⑥ 真实 token 消耗
 
-⭐ 注意：第 ⑤ 步会调真实 API（约 0.1 元/次）。
+注意：第 ⑤ 步会调真实 API（约 0.1 元/次）。
 """
 
 import io
@@ -129,9 +129,9 @@ def summary():
         for f in FAIL:
             print("     · " + f)
         print("")
-        print("  ⭐ 有失败项 → 说明刚才的改动可能坏了，先修再继续。")
+        print("  有失败项 → 说明刚才的改动可能坏了，先修再继续。")
     else:
-        print("  ⭐⭐ 全绿 → 改动没破坏东西，可以继续。")
+        print("  全绿 → 改动没破坏东西，可以继续。")
 
 
 if __name__ == "__main__":

@@ -74,12 +74,14 @@ def render_trace(out: dict, history_turns: int | None = None) -> str:#视图函�
     used = out.get("history_turns_used")
 
     bits = [f'共 <b>{steps}</b> 步', f'工具调用 <b>{len(trace)}</b> 次']
+    if out.get("tool_names"):
+        bits.append("工具"+"→".join(out["tool_names"]))
     if used is not None:
         bits.append(f'带入历史 <b>{used}</b> 轮')
     if history_turns is not None:
         bits.append(f'当前会话共 <b>{history_turns}</b> 轮')
 
-    # ⭐ 真实 token（API 报的数）；拿不到就退回估算值
+    # 真实 token（API 报的数）；拿不到就退回估算值
     usage = out.get("usage")
     if usage and usage.get("total"):
         bits.append(
@@ -93,7 +95,7 @@ def render_trace(out: dict, history_turns: int | None = None) -> str:#视图函�
     elif out.get("est_tokens"):
         bits.append(f'估算 token <b>{out["est_tokens"]}</b>')
 
-    # ⭐ 实际耗时（秒）
+    # 实际耗时（秒）
     if out.get("elapsed_sec") is not None:
         bits.append(f'耗时 <b>{out["elapsed_sec"]}s</b>')
 
@@ -127,7 +129,7 @@ def build_ui(agent_llm, max_turns: int = 3):
     def respond(message, history):
         """发送一条消息：返回 (更新后的 history, trace HTML)。
 
-        ⭐ history 是 Gradio 传进来的【之前】的对话（不含当前这条），
+        history 是 Gradio 传进来的【之前】的对话（不含当前这条），
            我们把它一并交给 run_agent，这样模型就能理解"它""那单"这类指代。
         """
         history = history or []
@@ -171,9 +173,9 @@ def build_ui(agent_llm, max_turns: int = 3):
                 msg = gr.Textbox(
                     placeholder="输入用户反馈，回车发送 / Shift+回车换行…",
                     show_label=False,
-                    # ⭐ lines=1：单行输入框，【回车】一定触发提交；
-                    #    如果写成 lines=2（多行 textarea），部分版本里回车会被
-                    #    当成换行吃掉。max_lines 让它随内容自动长高。
+                    # lines=1：单行输入框，【回车】一定触发提交；
+                    #  如果写成 lines=2（多行 textarea），部分版本里回车会被
+                    #  当成换行吃掉。max_lines 让它随内容自动长高。
                     lines=1, max_lines=6, autoscroll=True)
                 with gr.Row():
                     submit = gr.Button("发送", variant="primary", scale=2)

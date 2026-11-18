@@ -1,4 +1,4 @@
-﻿# 电商客服 Agent
+# 电商客服 Agent
 
 一个基于 **ReAct 循环 + Function Calling** 的电商客服处理系统。
 
@@ -194,7 +194,7 @@ token 管"内容量"，时间管"等了多久"，不能互相代表：
 | `ui.py` | **Gradio 界面**：左侧多轮对话，右侧 trace 轨迹 |
 | `main.py` | 统一入口：FastAPI（`/chat`、`/health`）+ 把 Gradio 挂到 `/` |
 | `test_guardrails.py` | 防护的单元测试（mock 模型，16 个断言） |
-| `test_agent_e2e.py` | 5 场景端到端验收（真实 API） |
+| `test_agent_e2e.py` | 冒烟检查 6 项：import / 提示词长度 / 工具注册 / 数据库 / 真实对话 / token（会调真实 API） |
 
 ---
 
@@ -219,7 +219,7 @@ token 管"内容量"，时间管"等了多久"，不能互相代表：
 
 **为什么用 Gradio 而不是手写 HTML：**
 - 多轮历史、发送后清空输入框、左右分栏 —— Chatbot 组件原生支持
-- 项目一也是 Gradio，技术栈一致
+- 和另一个 RAG 项目的技术栈一致，复用熟悉的组件
 - trace 部分用 `gr.HTML` 渲染，和手写 HTML 的工作量相当
 
 **一个服务两个入口**（`gr.mount_gradio_app`）：
